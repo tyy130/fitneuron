@@ -1,0 +1,398 @@
+:root {
+    --bg-primary: #000000;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent: #d4af37;
+    --accent-dark: #b8960c;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--accent-dark);
+}
+
+.btn {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg-primary);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.btn:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: none;
+    border-bottom: 1px solid var(--text-secondary);
+    background-color: transparent;
+    color: var(--text-primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+}
+
+.flash {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 0;
+    background-color: var(--bg-secondary);
+    color: var(--accent);
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.full-width {
+    width: 100%;
+    max-width: 100%;
+}
+
+header {
+    background-color: var(--bg-primary);
+    padding: 20px 0;
+    border-bottom: 1px solid var(--bg-secondary);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 30px;
+}
+
+nav ul li a {
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-image: url('/static/images/hero.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+
+.feature {
+    flex-basis: 30%;
+    background-color: var(--bg-secondary);
+    padding: 30px;
+    text-align: center;
+}
+
+.feature h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.dashboard-item {
+    background-color: var(--bg-secondary);
+    padding: 30px;
+}
+
+.workout-container {
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.workout-section {
+    margin-bottom: 20px;
+}
+
+.section-header {
+    cursor: pointer;
+    padding: 15px;
+    background-color: var(--bg-primary);
+    margin-bottom: 10px;
+    color: var(--accent);
+    font-size: 20px;
+}
+
+.section-content {
+    display: none;
+    padding: 0 15px;
+}
+
+.section-header.active + .section-content {
+    display: block;
+}
+
+.exercise {
+    background-color: var(--bg-secondary);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.exercise h3 {
+    color: var(--accent);
+    margin-top: 0;
+}
+
+.workout-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid var(--accent);
+    width: 80%;
+    max-width: 500px;
+}
+
+.log-input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.log-input label {
+    margin-right: 10px;
+}
+
+.log-input input {
+    width: 60px;
+    margin-right: 10px;
+}
+
+.profile-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.auth-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: calc(100vh - 80px); /* Adjust based on your header height */
+}
+
+.auth-form, .auth-info {
+    flex: 1;
+    padding: 2rem;
+}
+
+.auth-form {
+    background-color: var(--bg-secondary);
+}
+
+.auth-info {
+    background-color: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.auth-info img {
+    max-width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+.auth-form input {
+    width: 100%;
+    max-width: 300px;
+}
+
+.profile-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.profile-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    cursor: help;
+}
+
+.profile-form input[type="number"] {
+    width: 80px;
+    margin-right: 10px;
+}
+
+#workout-progress {
+    margin-bottom: 2rem;
+}
+
+.progress-bar {
+    background-color: var(--bg-secondary);
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    background-color: var(--accent);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .features {
+        flex-direction: column;
+    }
+
+    .feature {
+        margin-bottom: 30px;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin-left: 0;
+        margin-bottom: 10px;
+    }
+
+    .auth-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .auth-form, .auth-info {
+        width: 100%;
+    }
+}

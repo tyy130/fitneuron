@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Workout - FitNeuron{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Your Personalized Workout</h1>
+    <div id="workout-intro" class="workout-section">
+        <h2>Workout Introduction</h2>
+        <p>{{ workout.intro }}</p>
+        <button id="start-workout" class="btn">Start Workout</button>
+    </div>
+    <div id="workout-content" style="display: none;">
+        <div id="workout-progress">
+            <div class="progress-bar">
+                <div class="progress" style="width: 0%"></div>
+            </div>
+            <p><span id="current-exercise">0</span> / <span id="total-exercises">0</span> exercises completed</p>
+        </div>
+        <div class="workout-container">
+            <div id="exercise-display"></div>
+        </div>
+
+        <div class="workout-navigation">
+            <button id="prev-exercise" class="btn">Previous Exercise</button>
+            <button id="next-exercise" class="btn">Next Exercise</button>
+            <button id="complete-workout" class="btn" style="display: none;">Complete Workout</button>
+        </div>
+    </div>
+</div>
+
+<div id="workout-complete" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Workout Complete!</h2>
+        <p>Great job! You've finished your workout.</p>
+        <div id="workout-summary"></div>
+        <a href="{{ url_for('index') }}" class="btn">Back to Dashboard</a>
+    </div>
+</div>
+
+<!-- Exercise Log Modal -->
+<div id="exercise-log-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="modal-exercise-name"></h2>
+        <div class="log-input">
+            <label for="modal-sets">Sets:</label>
+            <input type="number" id="modal-sets" min="1">
+            <button class="decrease-sets">-</button>
+            <button class="increase-sets">+</button>
+        </div>
+        <div class="log-input">
+            <label for="modal-reps">Reps:</label>
+            <input type="number" id="modal-reps" min="1">
+            <button class="decrease-reps">-</button>
+            <button class="increase-reps">+</button>
+        </div>
+        <div class="log-input">
+            <label for="modal-weight">Weight (lbs):</label>
+            <input type="number" id="modal-weight" min="0" step="1">
+            <button class="decrease-weight">-</button>
+            <button class="increase-weight">+</button>
+        </div>
+        <textarea id="modal-feedback" placeholder="Provide feedback for this exercise"></textarea>
+        <button id="log-exercise" class="btn">Log Exercise</button>
+        <button id="close-modal" class="btn">Close</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const workout = {{ workout|tojson }};
+const workoutId = {{ workout_id }};
+let currentExerciseIndex = 0;
+let exercises = [];
+
+function initializeWorkout() {
+    exercises = [
+        ...workout.warm_up.map(e => ({...e, type: 'warm_up'})),
+        ...workout.main_workout.map(e => ({...e, type: 'main_workout'})),
+        ...workout.cool_down.map(e => ({...e, type: 'cool_down'}))
+    ];
+    document.getElementById('total-exercises').textContent = exercises.length;
+    showExercise(currentExerciseIndex);
+    updateProgress();
+}
+
+function showExercise(index) {
+    const exercise = exercises[index];
+    let html = `
+        <h2>${exercise.name}</h2>
+        <p><strong>${exercise.type === 'main_workout' ? 'Sets:' : 'Duration:'}</strong> ${exercise.type === 'main_workout' ? exercise.sets : exercise.duration}</p>
+        ${exercise.type === 'main_workout' ? `<p><strong>Reps:</strong> ${exercise.reps}</p>` : ''}
+        ${exercise.type === 'main_workout' && exercise.weight ? `<p><strong>Weight:</strong> ${exercise.weight} lbs</p>` : ''}
+        <p><strong>Instructions:</strong> ${exercise.instructions}</p>
+        <button onclick="openLogModal('${exercise.name}')" class="btn">Log Exercise</button>
+    `;
+    document.getElementById('exercise-display').innerHTML = html;
+    updateProgress();
+}
+
+function updateProgress() {
+    const progress = ((currentExerciseIndex + 1) / exercises.length) * 100;
+    document.querySelector('.progress').style.width = `${progress}%`;
+    document.getElementById('current-exercise').textContent = currentExerciseIndex + 1;
+    
+    if (currentExerciseIndex === exercises.length - 1) {
+        document.getElementById('next-exercise').style.display = 'none';
+        document.getElementById('complete-workout').style.display = 'inline-block';
+    } else {
+        document.getElementById('next-exercise').style.display = 'inline-block';
+        document.getElementById('complete-workout').style.display = 'none';
+    }
+}
+
+document.getElementById('start-workout').addEventListener('click', () => {
+    document.getElementById('workout-intro').style.display = 'none';
+    document.getElementById('workout-content').style.display = 'block';
+    initializeWorkout();
+});
+
+document.getElementById('prev-exercise').addEventListener('click', () => {
+    if (currentExerciseIndex > 0) {
+        currentExerciseIndex--;
+        showExercise(currentExerciseIndex);
+    }
+});
+
+document.getElementById('next-exercise').addEventListener('click', () => {
+    if (currentExerciseIndex < exercises.length - 1) {
+        currentExerciseIndex++;
+        showExercise(currentExerciseIndex);
+    }
+});
+
+document.getElementById('complete-workout').addEventListener('click', () => {
+    document.querySelector('.workout-container').style.display = 'none';
+    document.getElementById('workout-complete').style.display = 'block';
+    generateWorkoutSummary();
+    // Here you would typically send a request to the server to log the completed workout
+});
+
+function openLogModal(exerciseName) {
+    const modal = document.getElementById('exercise-log-modal');
+    document.getElementById('modal-exercise-name').textContent = exerciseName;
+    const exercise = exercises.find(e => e.name === exerciseName);
+    if (exercise.type === 'main_workout') {
+        document.getElementById('modal-sets').value = exercise.sets;
+        document.getElementById('modal-reps').value = exercise.reps;
+        document.getElementById('modal-weight').value = exercise.weight || 0;
+        document.getElementById('modal-weight').parentElement.style.display = 'block';
+    } else {
+        document.getElementById('modal-sets').value = 1;
+        document.getElementById('modal-reps').value = 1;
+        document.getElementById('modal-weight').parentElement.style.display = 'none';
+    }
+    modal.style.display = 'block';
+}
+
+document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('exercise-log-modal').style.display = 'none';
+});
+
+document.getElementById('log-exercise').addEventListener('click', () => {
+    const exerciseLog = {
+        workout_id: workoutId,
+        exercise_name: document.getElementById('modal-exercise-name').textContent,
+        sets: document.getElementById('modal-sets').value,
+        reps: document.getElementById('modal-reps').value,
+        weight: document.getElementById('modal-weight').value,
+        feedback: document.getElementById('modal-feedback').value
+    };
+
+    // Send exercise log to server
+    fetch('/log_exercise', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(exerciseLog),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Exercise logged successfully!');
+            document.getElementById('exercise-log-modal').style.display = 'none';
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+
+// Increase/decrease buttons functionality
+const increaseDecreaseButtons = document.querySelectorAll('.increase-sets, .decrease-sets, .increase-reps, .decrease-reps, .increase-weight, .decrease-weight');
+increaseDecreaseButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        const value = parseInt(input.value) || 0;
+        const step = input.id === 'modal-weight' ? 5 : 1; // Use 5 lbs increments for weight
+        if (this.classList.contains('increase-sets') || this.classList.contains('increase-reps') || this.classList.contains('increase-weight')) {
+            input.value = value + step;
+        } else {
+            input.value = Math.max(0, value - step);
+        }
+    });
+});
+
+function generateWorkoutSummary() {
+    let summary = '<h3>Workout Summary</h3>';
+    summary += '<ul>';
+    exercises.forEach(exercise => {
+        summary += `<li>${exercise.name} - `;
+        if (exercise.type === 'main_workout') {
+            summary += `${exercise.sets} sets, ${exercise.reps} reps`;
+            if (exercise.weight) {
+                summary += `, ${exercise.weight} lbs`;
+            }
+        } else {
+            summary += exercise.duration;
+        }
+        summary += '</li>';
+    });
+    summary += '</ul>';
+    document.getElementById('workout-summary').innerHTML = summary;
+}
+
+// Initialize the workout intro
+document.getElementById('workout-intro').querySelector('p').textContent = workout.intro;
+</script>
+{% endblock %}

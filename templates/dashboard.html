@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Welcome, {{ current_user.username }}!</h1>
+    <div class="quick-actions">
+        <a href="{{ url_for('generate_workout') }}" class="btn">Generate Workout</a>
+        <a href="{{ url_for('profile') }}" class="btn">Update Profile</a>
+    </div>
+    <div class="dashboard-grid">
+        <div class="dashboard-item">
+            <h2>Workout Stats</h2>
+            <div class="stat-grid">
+                <div class="stat">
+                    <h3>Workouts Completed</h3>
+                    <p>{{ stats.workouts_completed }}</p>
+                </div>
+                <div class="stat">
+                    <h3>Total Exercise Time</h3>
+                    <p>{{ stats.total_exercise_time }} minutes</p>
+                </div>
+                <div class="stat">
+                    <h3>Favorite Exercise</h3>
+                    <p>{{ stats.favorite_exercise }}</p>
+                </div>
+                <div class="stat">
+                    <h3>Calories Burned</h3>
+                    <p>{{ stats.calories_burned }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-item">
+            <h2>Recent Activity</h2>
+            <ul class="activity-list">
+                {% for activity in recent_activities %}
+                    <li>
+                        <span class="activity-date">{{ activity.date.strftime('%m/%d/%Y') }}</span>
+                        <span class="activity-name">{{ activity.exercise_name }}</span>
+                        <span class="activity-details">{{ activity.sets }} sets, {{ activity.reps }} reps, {{ activity.weight }} lbs</span>
+                    </li>
+                {% else %}
+                    <li>No recent activity</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="dashboard-item">
+            <h2>Fitness Goal Progress</h2>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ progress.percentage }}%"></div>
+            </div>
+            <p>{{ progress.current }} / {{ progress.goal }} {{ progress.unit }}</p>
+            <p>{{ progress.message }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

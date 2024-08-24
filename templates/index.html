@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if current_user.is_authenticated %}
+        <div class="container">
+            <h1>Welcome, {{ current_user.username }}!</h1>
+            <div class="dashboard">
+                <div class="quick-actions">
+                    <a href="{{ url_for('generate_workout') }}" class="btn">Generate Workout</a>
+                    <a href="{{ url_for('profile') }}" class="btn">Update Profile</a>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-item">
+                        <h2>Workout Stats</h2>
+                        <div class="chart-container">
+                            <canvas id="workoutStatsChart"></canvas>
+                        </div>
+                        <p>Complete more workouts to unlock detailed stats!</p>
+                    </div>
+                    <div class="dashboard-item">
+                        <h2>Recent Activity</h2>
+                        <ul>
+                            {% for activity in recent_activities %}
+                                <li>{{ activity.description }} - {{ activity.date.strftime('%m/%d/%Y') }}</li>
+                            {% else %}
+                                <li>No recent activity</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="dashboard-item">
+                        <h2>Fitness Goal Progress</h2>
+                        <div class="chart-container">
+                            <canvas id="fitnessGoalChart"></canvas>
+                        </div>
+                        <p>Set your fitness goals in your profile to track progress!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="hero full-width" style="background-image: url('/static/images/hero.png');">
+            <div class="hero-content">
+                <h1>Elevate Your Fitness Journey</h1>
+                <p>Experience AI-powered, personalized workouts tailored to your goals</p>
+                <a href="{{ url_for('register') }}" class="btn">Start Your Transformation</a>
+            </div>
+        </div>
+        <div class="features container">
+            <div class="feature">
+                <h2>Personalized Workouts</h2>
+                <p>Customized fitness routines adapt to your goals, equipment, and progress.</p>
+            </div>
+            <div class="feature">
+                <h2>AI-Powered Insights</h2>
+                <p>Leverage cutting-edge AI to optimize your training and results.</p>
+            </div>
+            <div class="feature">
+                <h2>Progress Tracking</h2>
+                <p>Visualize your fitness journey with detailed stats and progress graphs.</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if current_user.is_authenticated %}
+<script>
+    // Workout Stats Chart
+    var ctxWorkout = document.getElementById('workoutStatsChart').getContext('2d');
+    var workoutStatsChart = new Chart(ctxWorkout, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Missed'],
+            datasets: [{
+                data: [7, 3],
+                backgroundColor: ['#d4af37', '#1a1a1a']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Fitness Goal Chart
+    var ctxFitness = document.getElementById('fitnessGoalChart').getContext('2d');
+    var fitnessGoalChart = new Chart(ctxFitness, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Weight (lbs)',
+                data: [180, 178, 176, 174],
+                borderColor: '#d4af37',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

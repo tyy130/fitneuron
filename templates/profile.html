@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - FitNeuron{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Your Profile</h1>
+    <form method="POST" class="profile-form">
+        <div class="form-group">
+            <label for="fitness_level" title="Your current fitness level helps us tailor workouts to your abilities">Fitness Level:</label>
+            <select name="fitness_level" id="fitness_level" required>
+                <option value="">Select your fitness level</option>
+                <option value="Beginner" {% if profile and profile.fitness_level == 'Beginner' %}selected{% endif %}>Beginner</option>
+                <option value="Intermediate" {% if profile and profile.fitness_level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="Advanced" {% if profile and profile.fitness_level == 'Advanced' %}selected{% endif %}>Advanced</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="goals" title="Specify your fitness goals to help us create targeted workout plans">Fitness Goals:</label>
+            <textarea name="goals" id="goals" placeholder="e.g., Lose weight, Build muscle, Improve cardiovascular health" required>{{ profile.goals if profile else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="equipment_access" title="Let us know what equipment you have access to for your workouts">Equipment Access:</label>
+            <select name="equipment_access" id="equipment_access" required>
+                <option value="">Select your equipment access</option>
+                <option value="No equipment" {% if profile and profile.equipment_access == 'No equipment' %}selected{% endif %}>No equipment (Bodyweight only)</option>
+                <option value="Basic home equipment" {% if profile and profile.equipment_access == 'Basic home equipment' %}selected{% endif %}>Basic home equipment (Resistance bands, dumbbells)</option>
+                <option value="Full gym access" {% if profile and profile.equipment_access == 'Full gym access' %}selected{% endif %}>Full gym access</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="gym-name-group" style="display: none;">
+            <label for="gym_name" title="Knowing your gym helps us tailor workouts to available equipment">Gym Name:</label>
+            <input type="text" name="gym_name" id="gym_name" placeholder="Enter your gym name" value="{{ profile.gym_name if profile else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="workout_frequency" title="How often you plan to work out helps us design an appropriate program">Preferred Workout Frequency:</label>
+            <select name="workout_frequency" id="workout_frequency" required>
+                <option value="">Select your preferred workout frequency</option>
+                <option value="1-2 times per week" {% if profile and profile.workout_frequency == '1-2 times per week' %}selected{% endif %}>1-2 times per week</option>
+                <option value="3-4 times per week" {% if profile and profile.workout_frequency == '3-4 times per week' %}selected{% endif %}>3-4 times per week</option>
+                <option value="5+ times per week" {% if profile and profile.workout_frequency == '5+ times per week' %}selected{% endif %}>5+ times per week</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="medical_conditions" title="Any medical conditions or limitations help us ensure safe workout plans">Medical Conditions or Limitations:</label>
+            <textarea name="medical_conditions" id="medical_conditions" placeholder="e.g., Lower back pain, Knee injury, Asthma">{{ profile.medical_conditions if profile else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="height_feet" title="Your height helps us calculate appropriate metrics for your workouts">Height:</label>
+            <input type="number" name="height_feet" id="height_feet" min="1" max="8" value="{{ profile.height_feet if profile else '' }}" required> ft
+            <input type="number" name="height_inches" id="height_inches" min="0" max="11" value="{{ profile.height_inches if profile else '' }}" required> in
+        </div>
+
+        <div class="form-group">
+            <label for="weight" title="Your weight helps us calculate appropriate metrics for your workouts">Weight (lbs):</label>
+            <input type="number" name="weight" id="weight" value="{{ profile.weight|round|int if profile else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="use_metric" title="Choose your preferred unit system">Use Metric System:</label>
+            <input type="checkbox" name="use_metric" id="use_metric" {% if profile and profile.use_metric %}checked{% endif %}>
+        </div>
+
+        <button type="submit" class="btn">Update Profile</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const equipmentAccess = document.getElementById('equipment_access');
+    const gymNameGroup = document.getElementById('gym-name-group');
+    const useMetricCheckbox = document.getElementById('use_metric');
+    const heightFeetInput = document.getElementById('height_feet');
+    const heightInchesInput = document.getElementById('height_inches');
+    const weightInput = document.getElementById('weight');
+
+    function toggleGymNameField() {
+        gymNameGroup.style.display = equipmentAccess.value === 'Full gym access' ? 'block' : 'none';
+    }
+
+    function toggleUnits() {
+        if (useMetricCheckbox.checked) {
+            document.querySelector('label[for="height_feet"]').textContent = 'Height (cm):';
+            document.querySelector('label[for="weight"]').textContent = 'Weight (kg):';
+            heightInchesInput.style.display = 'none';
+            const totalInches = parseInt(heightFeetInput.value) * 12 + parseInt(heightInchesInput.value);
+            heightFeetInput.value = Math.round(totalInches * 2.54);
+            weightInput.value = Math.round(parseFloat(weightInput.value) / 2.20462);
+        } else {
+            document.querySelector('label[for="height_feet"]').textContent = 'Height:';
+            document.querySelector('label[for="weight"]').textContent = 'Weight (lbs):';
+            heightInchesInput.style.display = 'inline';
+            const totalCm = parseInt(heightFeetInput.value);
+            const totalInches = Math.round(totalCm / 2.54);
+            heightFeetInput.value = Math.floor(totalInches / 12);
+            heightInchesInput.value = totalInches % 12;
+            weightInput.value = Math.round(parseFloat(weightInput.value) * 2.20462);
+        }
+    }
+
+    equipmentAccess.addEventListener('change', toggleGymNameField);
+    useMetricCheckbox.addEventListener('change', toggleUnits);
+
+    // Initial setup
+    toggleGymNameField();
+    toggleUnits();
+});
+</script>
+{% endblock %}
